@@ -1,61 +1,53 @@
-import { supabase } from '.supabaseClient';
-import logo from './logo.svg';
+import { useState } from 'react';
+import { supabase } from './supabaseClient';
+//import logo from './logo.svg';
 import './App.css';
 
-const images = [
-  {id: 1, title: 'image 1'},
-  {id: 2, title: 'image 2'},
-  {id: 3, title: 'image 3'}
-];
-
-function Images() {
-  const listImages = images.map(pic =>
-    <li 
-    key={pic.id}
-    style={{
-      color: 'pink'
-    }}
-    >
-      {pic.title}
-      </li>
-   );
-   return (
-    <ul>{listImages}</ul>
-   )
-}
-
-const book = {
-  title: 'title here',
-  author: 'author here',
-  published: 'pubbed here',
-  image: 'https://images.unsplash.com/photo-1461988320302-91bde64fc8e4?ixid=2yJhcHBfaWQiOjEyMDd9&w=1500&dpr=2',
-  width: '264',
-  height: '378'
-};
-
 function Gallery() {
+  const[myImages, setMyImages] = useState([]);
+  async function getImages() {
+    let { data: images, error } = await supabase 
+      .from('images')
+      .select('*')
+    setMyImages(images); 
+  }
+  getImages();
   return (
     <div>
-      <h2>{book.title} ({book.published})</h2>
-      <p>{book.author}</p>
-      <img
-        className="bookCover"
-        src={book.image}
-        alt={book.title + 'cover'}
-        style={{
-          width:book.width,
-          height: book.height
-        }}
-        />
+      {
+        myImages.map(b => (
+        
+            <><p>{b.title}</p><p>
+            <img src={b.image}></img>
+          </p></>
+          
+        ))
+      }
     </div>
-  );
+  )
 }
 
+
 function RandomButton() {
+  const [myImages, setMyImages] = useState([]);
+  async function randomPhoto() {
+    let { data: images, error } = await supabase
+    .from ('images')
+    .select(1)
+    .order('random()')
+  setMyImages(images);
+  }
+  randomPhoto()
   return (
     <>
     <h3>Click Here for a Random Photo</h3>
-    <button>random</button>
+    <button onClick={randomPhoto}>random</button>
+    {myImages && (
+        <img
+          src={randomPhoto}
+          alt="random"
+        />
+      )}
     </>
   )
 }
@@ -64,8 +56,8 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
+        <h1> Flower Gallery </h1>
         <Gallery/>
-        <Images/>
         <RandomButton/>
       </header>
       
